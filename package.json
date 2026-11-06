@@ -1,0 +1,11 @@
+{
+  "name": "nopbai",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/serve.cjs",
+    "test": "node --test tests/ui.test.cjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.0"
+  }
+}

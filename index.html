@@ -3,597 +3,88 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Nhóm Thuyết Trình</title>
+<meta name="theme-color" content="#090909">
+<meta name="description" content="Quản lý nhóm thuyết trình và chia sẻ tài liệu.">
+<title>Nộp bài — Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%23e6e6e6'/%3E%3Cpath d='m20 9 12 6-12 6-12-6zm-12 13 12 6 12-6m-24 7 12 6 12-6' fill='none' stroke='%23181818' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
-:root{
-  --fg:#c8c8c8;
-  --fg-dim:#4a4a4a;
-  --fg-muted:#2e2e2e;
-  --border:rgba(255,255,255,.08);
-  --border-h:rgba(255,255,255,.24);
-  --bg-card:rgba(8,8,11,.72);
-  --bg-card-h:rgba(14,14,20,.88);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{
-  height:100%;
-  background:#040406;
-  color:var(--fg);
-  font-family:'JetBrains Mono',ui-monospace,monospace;
-  overflow-x:hidden;
-}
-#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
-
-.wrap{
-  position:relative;z-index:1;
-  max-width:1100px;margin:0 auto;
-  padding:48px 24px 100px;
-}
-
-/* strip */
-.strip{
-  display:flex;align-items:center;gap:14px;
-  margin-bottom:36px;
-}
-.strip-count{
-  font-size:10px;font-weight:500;
-  letter-spacing:.22em;color:#ffffff;
-  white-space:nowrap;
-  text-shadow:
-    0 0 4px rgba(255,255,255,.9),
-    0 0 10px rgba(255,255,255,.75),
-    0 0 22px rgba(235,235,235,.48);
-}
-.strip-line{
-  flex:1;height:1px;
-  background:linear-gradient(90deg,rgba(255,255,255,.07),transparent);
-}
-
-/* grid */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-}
-@media(max-width:860px){.grid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:520px){.grid{grid-template-columns:repeat(2,1fr)}}
-
-/* widget */
-.widget{
-  position:relative;
-  border:1px solid rgba(105,215,255,.42);
-  border-radius:8px;
-  background:rgba(8,8,11,.72);
-  backdrop-filter:blur(6px);
-  padding:16px 14px 14px;
-  min-height:130px;
-  cursor:pointer;
-  display:flex;flex-direction:column;gap:7px;
-  box-shadow:
-    0 0 0 1px rgba(70,195,255,.06) inset,
-    0 0 8px rgba(40,165,255,.12),
-    0 0 22px rgba(20,110,255,.06);
-  transition:
-    transform .22s cubic-bezier(.22,1,.36,1),
-    border-color .2s,background .2s,box-shadow .25s;
-}
-.widget:hover{
-  transform:translateY(-3px);
-  border-color:rgba(130,230,255,.95);
-  background:rgba(10,14,22,.88);
-  box-shadow:
-    0 0 0 1px rgba(120,225,255,.22) inset,
-    0 0 10px rgba(75,205,255,.34),
-    0 0 24px rgba(40,170,255,.28),
-    0 8px 32px rgba(0,0,0,.55);
-}
-.widget:hover .w-num{
-  font-size:10px;font-weight:700;letter-spacing:.24em;color:#ffffff;
-  text-shadow:
-    0 0 3px #fff,
-    0 0 7px rgba(120,225,255,1),
-    0 0 15px rgba(70,195,255,.95),
-    0 0 28px rgba(40,130,255,.65);
-}
-.widget:hover .w-names{
-  font-size:10px;line-height:1.75;color:#f2f2f2;flex:1;
-  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
-  font-weight:300;white-space:pre-line;
-  text-shadow:
-    0 0 4px rgba(255,255,255,.6),
-    0 0 10px rgba(235,235,235,.42),
-    0 0 18px rgba(220,220,220,.24);
-}
-@keyframes widgetIn{
-  from{opacity:0;transform:translateY(10px) scale(.985);filter:blur(4px)}
-  to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
-}
-.widget.enter{
-  animation:widgetIn .52s cubic-bezier(.22,1,.36,1) both;
-  animation-delay:var(--enter-delay,0ms);
-}
-
-.w-num{
-  font-size:10px;font-weight:700;letter-spacing:.24em;color:#fff;
-  text-shadow:0 0 7px rgba(255,255,255,.45),0 0 16px rgba(235,235,235,.18);
-}
-.w-line{height:1px;background:linear-gradient(90deg,rgba(255,255,255,.13),transparent)}
-.w-names{
-  font-size:10px;line-height:1.75;color:var(--fg-dim);flex:1;
-  text-shadow:0 0 7px rgba(245,245,245,.16);
-  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
-  font-weight:300;white-space:pre-line;
-}
-.w-hint{
-  font-size:8px;letter-spacing:.18em;color:#e8e8e8;margin-top:auto;
-  text-shadow:
-    0 0 4px rgba(255,255,255,.8),
-    0 0 10px rgba(235,235,235,.55);
-}
-
-/* create widget */
-.widget.create{
-  border:1px dashed rgba(255,255,255,.38);
-  align-items:center;justify-content:center;
-  background:rgba(255,255,255,.025);
-  gap:8px;
-  box-shadow:
-    0 0 8px rgba(245,245,245,.08),
-    0 0 20px rgba(40,150,255,.04) inset;
-}
-.create-icon{
-  font-size:22px;font-weight:300;color:#ffffff;line-height:1;
-  transition:color .2s,text-shadow .2s;
-  text-shadow:
-    0 0 4px #fff,
-    0 0 10px rgba(255,255,255,1),
-    0 0 22px rgba(50,180,255,.7);
-}
-.create-lbl{
-  font-size:9px;letter-spacing:.24em;color:#e9e9e9;
-  transition:color .2s,text-shadow .2s;
-  text-shadow:
-    0 0 4px rgba(105,220,255,.9),
-    0 0 12px rgba(235,235,235,.5);
-}
-.widget.create:hover{border-color:rgba(255,255,255,.95);box-shadow:0 0 12px rgba(245,245,245,.28),0 0 28px rgba(225,225,225,.18) inset}
-.widget.create:hover .create-icon{color:#fff;text-shadow:0 0 4px #fff,0 0 12px rgba(255,255,255,1),0 0 28px rgba(235,235,235,.85)}
-.widget.create:hover .create-lbl{color:#ffffff;text-shadow:0 0 5px #fff,0 0 12px rgba(90,220,255,1),0 0 24px rgba(225,225,225,.65)}
-
-/* overlay — blur + fade + panel motion */
-.overlay{
-  position:fixed;inset:0;z-index:40;
-  display:flex;align-items:center;justify-content:center;padding:20px;
-  opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .24s ease,visibility 0s linear .24s;
-}
-.overlay.open{
-  opacity:1;visibility:visible;pointer-events:auto;
-  transition-delay:0s;
-}
-.overlay::before{
-  content:'';position:absolute;inset:0;
-  background:rgba(0,0,0,0);
-  backdrop-filter:blur(0) saturate(1);
-  transition:background .28s ease,backdrop-filter .28s ease;
-}
-.overlay.open::before{
-  background:rgba(0,0,0,.75);
-  backdrop-filter:blur(14px) saturate(.6);
-}
-
-/* panel */
-.panel{
-  position:relative;z-index:1;
-  width:100%;max-width:430px;max-height:90vh;overflow-y:auto;
-  background:rgba(7,7,11,.97);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:12px;
-  box-shadow:0 32px 64px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.03) inset;
-  padding:28px 24px 24px;
-  opacity:0;
-  transform:translateY(12px) scale(.985);
-  transition:opacity .26s ease,transform .42s cubic-bezier(.22,1,.36,1);
-}
-.overlay.open .panel{
-  opacity:1;
-  transform:translateY(0) scale(1);
-}
-body.modal-open{overflow:hidden;}
-
-.panel-title{
-  font-size:11px;font-weight:700;letter-spacing:.3em;color:#ffffff;margin-bottom:22px;
-  text-shadow:
-    0 0 3px #fff,
-    0 0 8px rgba(255,255,255,1),
-    0 0 18px rgba(245,245,245,.95),
-    0 0 32px rgba(220,220,220,.65);
-}
-
-/* form */
-.field{display:block;margin-bottom:13px}
-.field-lbl{
-  display:block;font-size:8px;letter-spacing:.2em;color:#eeeeee;margin-bottom:6px;font-weight:400;
-  text-shadow:
-    0 0 4px rgba(255,255,255,.7),
-    0 0 10px rgba(235,235,235,.42);
-}
-input,textarea{
-  width:100%;background:rgba(255,255,255,.025);
-  border:1px solid rgba(255,255,255,.09);border-radius:6px;
-  color:var(--fg);font-family:'JetBrains Mono',monospace;
-  font-size:11px;font-weight:300;padding:9px 11px;outline:none;resize:vertical;
-  transition:border-color .15s,box-shadow .15s;
-}
-input:focus,textarea:focus{
-  border-color:rgba(255,255,255,.32);
-  box-shadow:0 0 0 3px rgba(255,255,255,.03);
-}
-::placeholder{color:rgba(255,255,255,.1)}
-input:disabled{opacity:.45;cursor:not-allowed}
-textarea{min-height:70px}
-
-.btn-row{display:flex;gap:8px;margin-top:8px}
-.btn{
-  font-family:'JetBrains Mono',monospace;cursor:pointer;border-radius:6px;
-  font-size:9px;letter-spacing:.22em;font-weight:500;
-  padding:11px 0;flex:1;transition:all .15s;
-}
-.btn-ok{background:#fff;color:#000;border:none}
-.btn-ok:hover{background:#e0e0e0}.btn:disabled{opacity:.45;cursor:wait}
-.btn-cancel{background:transparent;color:var(--fg-dim);border:1px solid rgba(255,255,255,.1)}
-.btn-cancel:hover{color:#fff;border-color:rgba(255,255,255,.32)}
-
-/* detail */
-.section-lbl{
-  font-size:8px;letter-spacing:.2em;color:#e5e5e5;margin:16px 0 7px;font-weight:400;
-  text-shadow:
-    0 0 4px rgba(255,255,255,.7),
-    0 0 10px rgba(235,235,235,.4);
-}
-.members-list{list-style:none}
-.members-list li{
-  font-size:11px;color:#f2f2f2;padding:5px 0;
-  border-bottom:1px solid rgba(100,210,255,.16);font-weight:300;
-  text-shadow:
-    0 0 4px rgba(255,255,255,.58),
-    0 0 10px rgba(235,235,235,.34);
-}
-.members-list li:last-child{border:none}
-.doc-links{display:flex;flex-direction:column;gap:6px}
-.doc-links a{
-  display:block;text-align:center;text-decoration:none;color:#f0f0f0;
-  font-size:9px;letter-spacing:.18em;
-  border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:10px 0;
-  transition:all .15s;font-weight:400;
-  text-shadow:0 0 5px rgba(255,255,255,.55),0 0 12px rgba(235,235,235,.3);
-  box-shadow:0 0 7px rgba(50,175,255,.08) inset;
-}
-.doc-links a:hover{border-color:rgba(255,255,255,.38);color:#fff}
-.btn-delete{
-  width:100%;margin-top:16px;background:transparent;
-  color:rgba(255,80,80,.45);border:1px solid rgba(255,80,80,.15);
-  border-radius:6px;font-family:'JetBrains Mono',monospace;
-  font-size:9px;letter-spacing:.2em;padding:10px 0;cursor:pointer;transition:all .15s;
-}
-.btn-delete:hover{color:#ff6b6b;border-color:rgba(255,80,80,.45)}
-
-/* banner thông báo khi chưa có config */
-#mode-banner{
-  position:fixed;top:0;left:0;right:0;z-index:99;
-  background:rgba(255,180,40,.12);
-  border-bottom:1px solid rgba(255,180,40,.2);
-  font-family:'JetBrains Mono',monospace;
-  font-size:9px;letter-spacing:.16em;color:rgba(255,180,40,.8);
-  text-align:center;padding:8px 16px;
-  display:none;
-}
-#mode-banner a{color:rgba(255,180,40,.9);text-decoration:underline;cursor:pointer}
-
-/* sync dot */
-.sync-dot{
-  position:fixed;bottom:16px;right:16px;z-index:5;
-  font-size:9px;letter-spacing:.14em;color:var(--fg-muted);
-  display:flex;align-items:center;gap:6px;
-  font-family:'JetBrains Mono',monospace;
-}
-.dot{width:5px;height:5px;border-radius:50%;background:#1e1e1e;transition:background .4s}
-.dot.online{background:#3fb96a;box-shadow:0 0 5px rgba(63,185,106,.55)}
-.dot.offline{background:#e05555}
-.dot.local{background:#f0a030;box-shadow:0 0 5px rgba(240,160,48,.5)}
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=4">
 </head>
-<body>
-<canvas id="bg"></canvas>
-
-<div id="mode-banner">
-  ⚠ chưa có firebase config — đang dùng localStorage (chỉ lưu trên máy này).
-  <a onclick="document.getElementById('mode-banner').style.display='none'">✕</a>
-</div>
-
-<div class="wrap">
-  <div class="strip">
-    <span class="strip-count" id="counter">0 / 15</span>
-    <div class="strip-line"></div>
+<body id="top">
+<svg class="icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 16l9 5 9-5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2m1-15a3 3 0 0 1 0 6m3 9v-2a6 6 0 0 0-2-4"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Zm0 0v6h6M8 13h8m-8 4h5"/></symbol>
+  <symbol id="i-slides" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M12 17v4m-4 0 4-4 4 4M7 9h4m-4 4h8"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13M9 9l12-2"/><ellipse cx="6" cy="18" rx="3" ry="3"/><ellipse cx="18" cy="16" rx="3" ry="3"/></symbol>
+  <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 3h7v7m0-7L10 14m0-10H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3ZM20 2v4m-2-2h4"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15v5Z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></symbol>
+</defs></svg>
+<a class="skip-link" href="#groups">Đến danh sách nhóm</a>
+<div class="ambient" aria-hidden="true"><canvas id="silkCanvas"></canvas><canvas id="glitterCanvas"></canvas></div>
+<div id="pageContent">
+<header class="topbar shell">
+  <div class="header-actions">
+    <div class="sync-dot" role="status"><span class="dot" id="syncDot"></span><span id="syncLabel">Đang kết nối</span></div>
+    <button id="motionToggle" class="motion-toggle" type="button" aria-label="Hiệu ứng chuyển động" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg><span id="motionLabel">Hiệu ứng</span></button>
   </div>
-  <div class="grid" id="grid"></div>
+</header>
+<div class="shell" id="mode-banner" role="status" hidden>
+  <span id="bannerMessage"></span>
+  <button class="banner-close" type="button" aria-label="Đóng thông báo" id="dismissBanner"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
 </div>
-
-<div class="sync-dot">
-  <div class="dot" id="syncDot"></div>
-  <span id="syncLabel">connecting</span>
-</div>
-
-<!-- Form tạo nhóm -->
-<div class="overlay" id="formOverlay">
-  <form class="panel" id="groupForm" autocomplete="off">
-    <button type="button" class="close-btn" data-close="formOverlay">&times;</button>
-    <div class="panel-title">TẠO NHÓM</div>
-    <label class="field">
-      <span class="field-lbl">SỐ THỨ TỰ</span>
-      <input id="fStt" type="number" min="1" max="99" required>
-    </label>
-    <label class="field">
-      <span class="field-lbl">THÀNH VIÊN — mỗi dòng một tên</span>
-      <textarea id="fMembers" required placeholder="Nguyễn Văn A&#10;Trần Thị B&#10;Lê Văn C"></textarea>
-    </label>
-    <label class="field">
-      <span class="field-lbl">LINK FILE CÂU HỎI</span>
-      <input id="fQuiz" type="url" required placeholder="https://drive.google.com/...">
-    </label>
-    <label class="field">
-      <span class="field-lbl">LINK POWERPOINT</span>
-      <input id="fPpt" type="url" required placeholder="https://drive.google.com/...">
-    </label>
-    <label class="field">
-      <span class="field-lbl">LINK FILE MP3</span>
-      <input id="fMp3" type="url" required placeholder="https://drive.google.com/...">
-    </label>
-    <div class="btn-row">
-      <button type="submit" class="btn btn-ok" id="saveBtn">OK</button>
-      <button type="button" class="btn btn-cancel" data-close="formOverlay">HỦY</button>
+<main class="shell">
+  <section class="groups-section" id="groups" aria-labelledby="groupsTitle">
+    <div class="section-heading">
+      <div><div class="section-title"><h1 id="groupsTitle">Nhóm thuyết trình</h1><span class="counter" id="counter">— / 15</span></div><p class="dashboard-stats"><span><b id="memberCount">—</b> thành viên</span><span aria-hidden="true">/</span><span><b id="documentCount">—</b> tài liệu</span></p></div>
+      <div class="group-actions"><label class="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Tìm nhóm hoặc thành viên</span><input id="searchInput" type="search" placeholder="Tìm nhóm hoặc thành viên…" autocomplete="off" disabled></label><button class="btn btn-ok" id="createGroupBtn" type="button" disabled><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Tạo nhóm</button></div>
     </div>
+    <p class="sr-only" id="searchStatus" role="status"></p>
+    <div class="empty-state glass" id="emptyState"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><h3 id="emptyTitle">Đang tải nhóm</h3><p id="emptyDescription">Vui lòng chờ trong giây lát.</p><button class="btn btn-ok" id="emptyCreateBtn" type="button" hidden><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Tạo nhóm</button></div>
+    <div class="grid" id="grid" aria-busy="true"></div>
+  </section>
+</main>
+</div>
+<div class="overlay" id="formOverlay" role="dialog" aria-modal="true" aria-labelledby="formTitle" aria-describedby="formDescription" aria-hidden="true" inert>
+  <form class="panel" id="groupForm" autocomplete="off">
+    <button type="button" class="close-btn" data-close="formOverlay" aria-label="Đóng biểu mẫu"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="panel-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></div>
+    <h2 class="panel-title" id="formTitle">Tạo nhóm mới</h2>
+    <p class="panel-description" id="formDescription">Thành viên và 3 liên kết tài liệu.</p>
+    <label class="field"><span class="field-lbl">Số thứ tự nhóm</span><input id="fStt" type="number" min="1" max="99" required></label>
+    <label class="field"><span class="field-lbl">Thành viên <small>· Mỗi dòng một tên</small></span><textarea id="fMembers" required placeholder="Nguyễn Văn A&#10;Trần Thị B&#10;Lê Văn C"></textarea></label>
+    <label class="field"><span class="field-lbl">Tài liệu câu hỏi</span><input id="fQuiz" type="url" required placeholder="https://drive.google.com/…"></label>
+    <label class="field"><span class="field-lbl">Bài thuyết trình PowerPoint</span><input id="fPpt" type="url" required placeholder="https://drive.google.com/…"></label>
+    <label class="field"><span class="field-lbl">File âm thanh MP3</span><input id="fMp3" type="url" required placeholder="https://drive.google.com/…"></label>
+    <div class="btn-row"><button type="button" class="btn btn-cancel" data-close="formOverlay">Hủy bỏ</button><button type="submit" class="btn btn-ok" id="saveBtn">Tạo nhóm</button></div>
   </form>
 </div>
-
-<!-- Chi tiết nhóm -->
-<div class="overlay" id="detailOverlay">
+<div class="overlay" id="detailOverlay" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true" inert>
   <div class="panel">
-    <button class="close-btn" data-close="detailOverlay">&times;</button>
-    <div class="panel-title" id="dTitle">NHÓM 01</div>
-    <div class="section-lbl">THÀNH VIÊN</div>
-    <ul class="members-list" id="dMembers"></ul>
-    <div class="section-lbl">TÀI LIỆU</div>
+    <button class="close-btn" type="button" data-close="detailOverlay" aria-label="Đóng chi tiết"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="panel-icon"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></div>
+    <h2 class="panel-title" id="dTitle">Nhóm 01</h2>
+    <h3 class="section-lbl">Thành viên</h3><ul class="members-list" id="dMembers"></ul>
+    <h3 class="section-lbl">Tài liệu được chia sẻ</h3>
     <div class="doc-links">
-      <a id="dQuiz" target="_blank" rel="noopener">File câu hỏi</a>
-      <a id="dPpt"  target="_blank" rel="noopener">PowerPoint</a>
-      <a id="dMp3"  target="_blank" rel="noopener">File MP3</a>
+      <a id="dQuiz" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>File câu hỏi<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+      <a id="dPpt" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-slides"/></svg>PowerPoint<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
+      <a id="dMp3" target="_blank" rel="noopener noreferrer"><svg class="icon" aria-hidden="true"><use href="#i-music"/></svg>File MP3<svg class="icon" aria-hidden="true"><use href="#i-external"/></svg></a>
     </div>
-    <button class="btn btn-cancel" id="dEdit" style="width:100%;margin-top:12px">CHỈNH SỬA</button>
-    <button class="btn-delete" id="dDelete">Xóa nhóm này</button>
+    <div class="detail-actions"><button class="btn btn-cancel" id="dEdit" type="button"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg>Chỉnh sửa</button><button class="btn btn-delete" id="dDelete" type="button">Xóa nhóm</button></div>
   </div>
 </div>
-
-<!-- ═══ RAIN — hướng theo chuột, giới hạn góc, field né con trỏ ═══ -->
-<script>
-(function(){
-  const cv = document.getElementById('bg');
-  const cx = cv.getContext('2d');
-  let W=0,H=0,heavy=[],light=[];
-
-  // Giới hạn quanh phương thẳng đứng: mưa luôn có thành phần rơi xuống.
-  const MIN_ANGLE=-0.62; // ~ -35.5°
-  const MAX_ANGLE= 0.62; // ~ +35.5°
-  const REPEL_RADIUS=128;
-  const CURSOR_HOLE=32;
-
-  let mx=-9999,my=-9999;
-  let angle=0,targetAngle=0;
-
-  const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
-  const smooth=t=>t*t*(3-2*t);
-
-  window.addEventListener('pointermove',e=>{
-    if(e.pointerType==='touch') return;
-    mx=e.clientX; my=e.clientY;
-
-    // Bám vị trí ngang của chuột, rồi clamp tuyệt đối.
-    // Vì |angle| <= 35.5°, cos(angle) luôn dương => không có mưa bay ngược lên.
-    const horizontal=clamp(
-      (mx-W*.5)/Math.max(1,W*.5),-1,1
-    );
-    targetAngle=clamp(horizontal*MAX_ANGLE,MIN_ANGLE,MAX_ANGLE);
-  },{passive:true});
-
-  function resetPointer(){
-    mx=-9999;my=-9999;targetAngle=0;
-  }
-  window.addEventListener('pointerleave',resetPointer);
-  window.addEventListener('blur',resetPointer);
-
-  function mkH(){
-    return {
-      x:Math.random()*W,y:Math.random()*H,
-      s:24+Math.random()*16,
-      len:14+Math.random()*18,
-      op:.16+Math.random()*.20,
-      ox:0,oy:0
-    };
-  }
-  function mkL(){
-    return {
-      x:Math.random()*W,y:Math.random()*H,
-      s:10+Math.random()*8,
-      len:5+Math.random()*6,
-      op:.055+Math.random()*.075,
-      ox:0,oy:0
-    };
-  }
-
-  function resize(){
-    W=cv.width=innerWidth;
-    H=cv.height=innerHeight;
-    const area=Math.max(1,W*H);
-    heavy=Array.from({length:Math.min(220,area/5500|0)},mkH);
-    light=Array.from({length:Math.min(300,area/3600|0)},mkL);
-  }
-  window.addEventListener('resize',resize,{passive:true});
-  resize();
-
-  // Vector field cục bộ: xa cursor = hướng mưa chung,
-  // gần cursor = thêm lực đẩy xuyên tâm nhưng vẫn khóa vy > 0.
-  function velocityFor(d,baseDx,baseDy,strength){
-    const px=d.x+d.ox,py=d.y+d.oy;
-    const rx=px-mx,ry=py-my;
-    const dist2=rx*rx+ry*ry;
-
-    let vx=baseDx,vy=baseDy;
-
-    if(dist2<REPEL_RADIUS*REPEL_RADIUS){
-      const dist=Math.sqrt(dist2)||1;
-      const falloff=smooth(1-dist/REPEL_RADIUS);
-      const nx=rx/dist,ny=ry/dist;
-      vx+=nx*falloff*strength;
-      vy+=ny*falloff*strength*.38;
-    }
-
-    vy=Math.max(vy,.52);
-    const mag=Math.hypot(vx,vy)||1;
-    return {x:vx/mag,y:vy/mag};
-  }
-
-  // Dịch offset nhẹ để hạt "nhường đường" trước khi đổi velocity.
-  function repel(d,str){
-    const dx=d.x+d.ox-mx,dy=d.y+d.oy-my;
-    const d2=dx*dx+dy*dy;
-
-    if(d2<REPEL_RADIUS*REPEL_RADIUS){
-      const dist=Math.sqrt(d2)||1;
-      const f=smooth(1-dist/REPEL_RADIUS);
-      d.ox+=(dx/dist)*f*str;
-      d.oy+=(dy/dist)*f*str*.55;
-    }
-  }
-
-  // Nếu line cắt vùng quanh cursor, cắt chính xác phần giao nhau.
-  function drawOutsideCursor(x1,y1,x2,y2,color,width){
-    const ax=x1-mx,ay=y1-my;
-    const bx=x2-mx,by=y2-my;
-    const vx=bx-ax,vy=by-ay;
-    const vv=vx*vx+vy*vy;
-
-    cx.strokeStyle=color;
-    cx.lineWidth=width;
-
-    if(mx<-1000 || vv===0){
-      cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();
-      return;
-    }
-
-    const t=clamp(-(ax*vx+ay*vy)/vv,0,1);
-    const px=ax+vx*t,py=ay+vy*t;
-    const dist=Math.hypot(px,py);
-
-    if(dist>=CURSOR_HOLE){
-      cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();
-      return;
-    }
-
-    const total=Math.sqrt(vv);
-    const half=Math.min(total*.45,CURSOR_HOLE+4);
-    const ux=vx/total,uy=vy/total;
-    const cutX1=mx-ux*half,cutY1=my-uy*half;
-    const cutX2=mx+ux*half,cutY2=my+uy*half;
-
-    if(Math.hypot(cutX1-x1,cutY1-y1)>.5){
-      cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(cutX1,cutY1);cx.stroke();
-    }
-    if(Math.hypot(x2-cutX2,y2-cutY2)>.5){
-      cx.beginPath();cx.moveTo(cutX2,cutY2);cx.lineTo(x2,y2);cx.stroke();
-    }
-  }
-
-  function respawn(d,mk,dx){
-    Object.assign(d,mk());
-    if(Math.abs(dx)>.15 && Math.random()<.4){
-      d.x=dx>0?-20:W+20;
-      d.y=Math.random()*H*.55;
-    }else{
-      d.x=Math.random()*W;
-      d.y=-30-Math.random()*70;
-    }
-  }
-
-  (function tick(){
-    cx.clearRect(0,0,W,H);
-
-    angle+=(targetAngle-angle)*.055;
-    const baseDx=Math.sin(angle);
-    const baseDy=Math.cos(angle);
-
-    cx.lineCap='round';
-
-    cx.lineWidth=.9;
-    cx.shadowBlur=0;
-    for(const d of heavy){
-      repel(d,11);
-      d.ox*=.84;d.oy*=.84;
-
-      const v=velocityFor(d,baseDx,baseDy,.95);
-      const rx=d.x+d.ox,ry=d.y+d.oy;
-
-      // Hai pass: một lớp glow cực nhẹ + nét chính rõ hơn.
-      cx.shadowBlur=5;
-      cx.shadowColor='rgba(160,200,236,'+(d.op*.32)+')';
-      drawOutsideCursor(
-        rx-v.x*d.len,ry-v.y*d.len,rx,ry,
-        'rgba(180,214,244,'+(d.op*.35)+')',1.8
-      );
-
-      cx.shadowBlur=0;
-      drawOutsideCursor(
-        rx-v.x*d.len,ry-v.y*d.len,rx,ry,
-        'rgba(175,210,242,'+d.op+')',.9
-      );
-
-      d.x+=v.x*d.s;
-      d.y+=v.y*d.s;
-
-      if(d.y-d.len>H || d.x<-50 || d.x>W+50){
-        respawn(d,mkH,baseDx);
-      }
-    }
-
-    cx.shadowBlur=0;
-    cx.lineWidth=.45;
-    for(const d of light){
-      repel(d,7);
-      d.ox*=.87;d.oy*=.87;
-
-      const v=velocityFor(d,baseDx,baseDy,.72);
-      const rx=d.x+d.ox,ry=d.y+d.oy;
-
-      drawOutsideCursor(
-        rx-v.x*d.len,ry-v.y*d.len,rx,ry,
-        'rgba(210,228,246,'+d.op+')',.45
-      );
-
-      d.x+=v.x*d.s;
-      d.y+=v.y*d.s;
-
-      if(d.y-d.len>H || d.x<-50 || d.x>W+50){
-        respawn(d,mkL,baseDx);
-      }
-    }
-
-    requestAnimationFrame(tick);
-  })();
-})();
-</script>
-
-<!-- ═══ APP LOGIC — Firebase + localStorage fallback ═══ -->
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+<script src="effects.js?v=4" defer></script>
 <script type="module">
 /* ══ FIREBASE CONFIG ══════════════════════════════════════
    Config hiện đã được điền. Firebase API key của web app không phải password;
@@ -632,6 +123,22 @@ const saveBtn=document.getElementById('saveBtn');
 const sttInput=document.getElementById('fStt');
 const formTitle=document.querySelector('#groupForm .panel-title');
 const editBtn=document.getElementById('dEdit');
+const searchInput=document.getElementById('searchInput');
+const createGroupBtn=document.getElementById('createGroupBtn');
+let returnFocus=null;
+let toastTimer;
+
+function icon(name){
+  return '<svg class="icon" aria-hidden="true"><use href="#i-'+name+'"/></svg>';
+}
+
+function notify(message,isError=false){
+  const toast=document.getElementById('toast');
+  clearTimeout(toastTimer);
+  toast.textContent=message;
+  toast.className='toast show'+(isError?' error':'');
+  toastTimer=setTimeout(()=>toast.classList.remove('show'),5000);
+}
 
 function setStatus(type,text){
   dot.className='dot '+type;
@@ -640,8 +147,24 @@ function setStatus(type,text){
 
 function showLocalBanner(text){
   const banner=document.getElementById('mode-banner');
-  banner.firstChild.textContent='⚠ '+text+' ';
-  banner.style.display='block';
+  document.getElementById('bannerMessage').textContent=text;
+  banner.hidden=false;
+}
+document.getElementById('dismissBanner').onclick=()=>{
+  document.getElementById('mode-banner').hidden=true;
+};
+
+function validGroup(g){
+  return g && Number.isInteger(Number(g.stt)) && Number(g.stt)>0 &&
+    Number(g.stt)<=99 && Array.isArray(g.members) &&
+    g.members.every(m=>typeof m==='string') && g.links && typeof g.links==='object';
+}
+
+function safeLink(value){
+  try{
+    const url=new URL(value);
+    return ['https:','http:'].includes(url.protocol)?url.href:null;
+  }catch{return null;}
 }
 
 /* ═══ FIREBASE ═══ */
@@ -662,16 +185,21 @@ async function initFirebase(){
 
     snap.forEach(child=>{
       const g=child.val();
-      if(g && Number.isFinite(Number(g.stt))){
+      if(validGroup(g)){
         groups[g.stt]={...g,_key:child.key};
       }
     });
 
     render();
-    setStatus('online','realtime');
+    setStatus('online','Đã đồng bộ');
   },err=>{
     console.error('Firebase read error:',err);
-    setStatus('offline','rules / offline');
+    setStatus('offline','Chưa thể đồng bộ');
+    grid.setAttribute('aria-busy','false');
+    if(!hasRenderedOnce){
+      document.getElementById('emptyTitle').textContent='Chưa tải được danh sách nhóm';
+      document.getElementById('emptyDescription').textContent='Vui lòng kiểm tra kết nối và tải lại trang.';
+    }
     showLocalBanner(
       'Firebase chưa đọc được dữ liệu — kiểm tra Realtime Database Rules.'
     );
@@ -705,7 +233,10 @@ function initLocal(){
   const LS_KEY='nhom_thuyet_trinh_v1';
 
   function load(){
-    try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}');}
+    try{
+      const stored=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+      return Object.fromEntries(Object.entries(stored||{}).filter(([,g])=>validGroup(g)));
+    }
     catch(e){return {};}
   }
   function save(data){
@@ -714,24 +245,28 @@ function initLocal(){
 
   groups=load();
   render();
-  setStatus('local','local only');
+  setStatus('local','Lưu trên máy này');
 
   window._saveGroup=async data=>{
-    groups[data.stt]={...data,_key:String(data.stt)};
-    save(groups);
+    const next={...groups,[data.stt]:{...data,_key:String(data.stt)}};
+    save(next);
+    groups=next;
     render();
   };
 
   window._updateGroup=async(stt,data)=>{
     if(!groups[stt]) throw new Error('Không tìm thấy group để cập nhật.');
-    groups[stt]={...data,_key:String(stt)};
-    save(groups);
+    const next={...groups,[stt]:{...data,_key:String(stt)}};
+    save(next);
+    groups=next;
     render();
   };
 
   window._deleteGroup=async stt=>{
-    delete groups[stt];
-    save(groups);
+    const next={...groups};
+    delete next[stt];
+    save(next);
+    groups=next;
     render();
   };
 }
@@ -743,19 +278,29 @@ function esc(s){
   );
 }
 
+function searchText(value){
+  return value.toLocaleLowerCase('vi').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').trim();
+}
+
+searchInput.addEventListener('input',()=>render());
+createGroupBtn.onclick=()=>openForm();
+document.getElementById('emptyCreateBtn').onclick=()=>openForm();
+
 function render(){
   grid.innerHTML='';
 
   const sorted=Object.values(groups).sort((a,b)=>a.stt-b.stt);
+  const query=searchText(searchInput.value);
+  const filtered=sorted.filter(g=>searchText('nhóm '+g.stt+' nhóm '+String(g.stt).padStart(2,'0')+' '+g.members.join(' ')).includes(query));
   const currentKeys=new Set(
     sorted.map(g=>String(g._key ?? g.stt))
   );
 
-  sorted.forEach((g,index)=>{
+  filtered.forEach((g,index)=>{
     const el=widgetEl(g);
     const key=String(g._key ?? g.stt);
 
-    if(hasRenderedOnce && !seenGroupKeys.has(key)){
+    if(!hasRenderedOnce || !seenGroupKeys.has(key)){
       el.classList.add('enter');
       el.style.setProperty(
         '--enter-delay',
@@ -766,8 +311,19 @@ function render(){
     grid.appendChild(el);
   });
 
-  if(sorted.length<MAX) grid.appendChild(createEl());
+  if(sorted.length>0 && sorted.length<MAX && !query) grid.appendChild(createEl());
   counter.textContent=sorted.length+' / '+MAX;
+  createGroupBtn.disabled=sorted.length>=MAX;
+  document.getElementById('memberCount').textContent=sorted.reduce((n,g)=>n+g.members.length,0);
+  document.getElementById('documentCount').textContent=sorted.reduce((n,g)=>n+['quiz','ppt','mp3'].filter(k=>safeLink(g.links[k])).length,0);
+  const empty=document.getElementById('emptyState');
+  empty.hidden=filtered.length>0;
+  document.getElementById('emptyCreateBtn').hidden=Boolean(query)||sorted.length>0;
+  document.getElementById('emptyTitle').textContent=query?'Không tìm thấy nhóm':'Chưa có nhóm';
+  document.getElementById('emptyDescription').textContent=query?'Thử số nhóm hoặc tên thành viên khác.':'Thêm nhóm để chia sẻ tài liệu.';
+  document.getElementById('searchStatus').textContent=query?filtered.length+' nhóm phù hợp.':sorted.length+' nhóm đã tham gia.';
+  grid.setAttribute('aria-busy','false');
+  searchInput.disabled=false;
 
   seenGroupKeys.clear();
   currentKeys.forEach(k=>seenGroupKeys.add(k));
@@ -775,41 +331,64 @@ function render(){
 }
 
 function widgetEl(g){
-  const d=document.createElement('div');
+  const d=document.createElement('button');
+  d.type='button';
   d.className='widget';
+  d.dataset.stt=g.stt;
+  const number=String(g.stt).padStart(2,'0');
+  const documents=['quiz','ppt','mp3'].filter(k=>safeLink(g.links[k])).length;
+  d.setAttribute('aria-label','Nhóm '+number+' · '+g.members.length+' thành viên · Xem tài liệu');
+  const names=g.members.slice(0,3).map(esc).join('\n');
+  const more=g.members.length>3?'\n+ '+(g.members.length-3)+' thành viên khác':'';
   d.innerHTML=
-    '<div class="w-num">nhóm '+String(g.stt).padStart(2,'0')+'</div>'+
-    '<div class="w-line"></div>'+
-    '<div class="w-names">'+g.members.map(esc).join('\n')+'</div>'+
-    '<div class="w-hint">xem tài liệu →</div>';
+    '<span class="w-top"><span class="w-group"><span class="w-icon">'+icon('users')+'</span><span><span class="w-num">Nhóm '+number+'</span><span class="w-sub">'+g.members.length+' thành viên</span></span></span><span class="w-status">'+icon('file')+documents+' tài liệu</span></span>'+
+    '<span class="w-names">'+names+more+'</span>'+
+    '<span class="w-footer"><span class="avatars" aria-hidden="true">'+g.members.slice(0,3).map(m=>'<span class="avatar">'+esc(initials(m))+'</span>').join('')+(g.members.length>3?'<span class="avatar">+'+(g.members.length-3)+'</span>':'')+'</span><span class="w-hint">Xem tài liệu'+icon('arrow')+'</span></span>';
   d.onclick=()=>openDetail(g.stt);
   return d;
 }
 
 function createEl(){
-  const d=document.createElement('div');
+  const d=document.createElement('button');
+  d.type='button';
   d.className='widget create';
   d.innerHTML=
-    '<div class="create-icon">+</div>'+
-    '<div class="create-lbl">tạo nhóm</div>';
+    '<span class="create-icon">'+icon('plus')+'</span>'+
+    '<span class="create-lbl">Tạo nhóm</span>';
+  d.setAttribute('aria-label','Tạo nhóm mới');
   d.onclick=()=>openForm();
   return d;
 }
 
+function initials(name){
+  return name.trim().split(/\s+/).slice(-2).map(part=>part[0]||'').join('').toLocaleUpperCase('vi');
+}
+
 /* ═══ MODALS ═══ */
 function updateBodyLock(){
-  document.body.classList.toggle(
-    'modal-open',
-    document.querySelector('.overlay.open')!==null
-  );
+  const isOpen=document.querySelector('.overlay.open')!==null;
+  document.body.classList.toggle('modal-open',isOpen);
+  document.getElementById('pageContent').inert=isOpen;
 }
 function openO(id){
-  document.getElementById(id).classList.add('open');
+  returnFocus=document.activeElement;
+  const overlay=document.getElementById(id);
+  overlay.inert=false;
+  overlay.removeAttribute('aria-hidden');
+  overlay.classList.add('open');
   updateBodyLock();
+  const first=id==='formOverlay'?overlay.querySelector('input:not(:disabled),textarea'):overlay.querySelector('button');
+  first.focus({preventScroll:true});
 }
 function closeO(id){
-  document.getElementById(id).classList.remove('open');
+  const overlay=document.getElementById(id);
+  overlay.classList.remove('open');
+  overlay.inert=true;
   updateBodyLock();
+  const fallback=returnFocus?.dataset.stt?grid.querySelector('[data-stt="'+returnFocus.dataset.stt+'"]'):null;
+  const target=returnFocus?.isConnected&&!returnFocus.disabled&&returnFocus.getClientRects().length?returnFocus:fallback||(!createGroupBtn.disabled?createGroupBtn:searchInput);
+  target.focus({preventScroll:true});
+  overlay.setAttribute('aria-hidden','true');
 }
 
 document.querySelectorAll('[data-close]').forEach(b=>
@@ -819,23 +398,29 @@ document.querySelectorAll('[data-close]').forEach(b=>
 document.querySelectorAll('.overlay').forEach(o=>
   o.addEventListener('click',e=>{
     if(e.target===o){
-      o.classList.remove('open');
-      updateBodyLock();
+      closeO(o.id);
     }
   })
 );
 
 document.addEventListener('keydown',e=>{
+  const overlay=document.querySelector('.overlay.open');
+  if(!overlay) return;
   if(e.key==='Escape'){
-    document.querySelectorAll('.overlay.open')
-      .forEach(o=>o.classList.remove('open'));
-    updateBodyLock();
+    closeO(overlay.id);
+  }
+  if(e.key==='Tab'){
+    const focusable=[...overlay.querySelectorAll('button:not(:disabled),input:not(:disabled),textarea,a[href]')];
+    const first=focusable[0],last=focusable.at(-1);
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
   }
 });
 
 function resetFormMode(){
   editingStt=null;
-  formTitle.textContent='TẠO NHÓM';
+  formTitle.textContent='Tạo nhóm mới';
+  saveBtn.textContent='Tạo nhóm';
   sttInput.disabled=false;
 }
 
@@ -846,7 +431,8 @@ function openForm(stt=null){
   if(stt!==null && groups[stt]){
     const g=groups[stt];
     editingStt=stt;
-    formTitle.textContent='CHỈNH SỬA NHÓM';
+    formTitle.textContent='Chỉnh sửa nhóm';
+    saveBtn.textContent='Lưu thay đổi';
     sttInput.value=g.stt;
     sttInput.disabled=true;
     document.getElementById('fMembers').value=g.members.join('\n');
@@ -869,18 +455,19 @@ document.getElementById('groupForm').addEventListener('submit',async e=>{
   e.preventDefault();
 
   if(!editingStt && Object.keys(groups).length>=MAX){
-    alert('Đã đủ '+MAX+' nhóm.');
+    notify('Đã đủ '+MAX+' nhóm.',true);
     return;
   }
 
   const stt=parseInt(sttInput.value,10);
-  if(!stt || stt<1){
-    alert('Số thứ tự không hợp lệ.');
+  if(!Number.isInteger(stt) || stt<1 || stt>99){
+    notify('Số thứ tự phải nằm trong khoảng 1–99.',true);
     return;
   }
 
   if(!editingStt && groups[stt]){
-    alert('Nhóm '+stt+' đã tồn tại.');
+    notify('Nhóm '+stt+' đã tồn tại. Hãy chọn số thứ tự khác.',true);
+    sttInput.focus();
     return;
   }
 
@@ -890,7 +477,7 @@ document.getElementById('groupForm').addEventListener('submit',async e=>{
     .filter(Boolean);
 
   if(!members.length){
-    alert('Nhập ít nhất 1 thành viên.');
+    notify('Nhập ít nhất 1 thành viên.',true);
     return;
   }
 
@@ -899,14 +486,14 @@ document.getElementById('groupForm').addEventListener('submit',async e=>{
   const mp3=document.getElementById('fMp3').value.trim();
 
   for(const u of [quiz,ppt,mp3]){
-    if(!/^https?:\/\//i.test(u)){
-      alert('Link phải bắt đầu bằng https://');
+    if(!safeLink(u)){
+      notify('Nhập đường dẫn hợp lệ bắt đầu bằng https:// hoặc http://.',true);
       return;
     }
   }
 
   saveBtn.disabled=true;
-  saveBtn.textContent='...';
+  saveBtn.textContent='Đang lưu…';
 
   try{
     const data={
@@ -922,14 +509,13 @@ document.getElementById('groupForm').addEventListener('submit',async e=>{
     }
 
     closeO('formOverlay');
+    notify(editingStt?'Đã cập nhật nhóm.':'Đã tạo nhóm.');
   }catch(err){
     console.error(err);
-    alert(
-      'Không thể lưu thay đổi. Hãy kiểm tra Firebase Realtime Database Rules và kết nối mạng.'
-    );
+    notify('Chưa lưu được thay đổi. Vui lòng kiểm tra kết nối hoặc quyền lưu dữ liệu và thử lại.',true);
   }finally{
     saveBtn.disabled=false;
-    saveBtn.textContent='OK';
+    saveBtn.textContent=editingStt?'Lưu thay đổi':'Tạo nhóm';
   }
 });
 
@@ -939,14 +525,17 @@ function openDetail(stt){
 
   currentStt=stt;
   document.getElementById('dTitle').textContent=
-    'nhóm '+String(g.stt).padStart(2,'0');
+    'Nhóm '+String(g.stt).padStart(2,'0');
 
   document.getElementById('dMembers').innerHTML=
-    g.members.map(m=>'<li>'+esc(m)+'</li>').join('');
+    g.members.map(m=>'<li><span class="avatar" aria-hidden="true">'+esc(initials(m))+'</span>'+esc(m)+'</li>').join('');
 
-  document.getElementById('dQuiz').href=g.links.quiz;
-  document.getElementById('dPpt').href=g.links.ppt;
-  document.getElementById('dMp3').href=g.links.mp3;
+  for(const [id,key] of [['dQuiz','quiz'],['dPpt','ppt'],['dMp3','mp3']]){
+    const link=document.getElementById(id);
+    const href=safeLink(g.links[key]);
+    if(href){link.href=href;link.removeAttribute('aria-disabled');}
+    else{link.removeAttribute('href');link.setAttribute('aria-disabled','true');}
+  }
 
   openO('detailOverlay');
 }
@@ -963,21 +552,20 @@ document.getElementById('dDelete').onclick=async()=>{
   try{
     await window._deleteGroup(currentStt);
     closeO('detailOverlay');
+    notify('Đã xóa nhóm.');
   }catch(err){
     console.error(err);
-    alert(
-      'Không thể xóa nhóm. Nếu Rules công khai kiểu add/edit-only, thao tác xóa sẽ bị chặn.'
-    );
+    notify('Chưa xóa được nhóm. Vui lòng kiểm tra kết nối hoặc quyền xóa dữ liệu.',true);
   }
 };
 
 /* ═══ INIT ═══ */
 if(USE_FIREBASE){
-  setStatus('','connecting...');
+  setStatus('','Đang kết nối');
 
   initFirebase().catch(err=>{
     console.warn('Firebase init error:',err);
-    setStatus('offline','firebase error');
+    setStatus('offline','Chưa kết nối');
     showLocalBanner(
       'Firebase không khởi tạo được — kiểm tra config / SDK / mạng.'
     );
